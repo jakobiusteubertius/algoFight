@@ -29,5 +29,9 @@
             android:name=".ScreenAnalysisService"
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
+
+        <receiver
+            android:name=".TrainingReminderReceiver"
+            android:exported="false" />
     </application>
 </manifest>

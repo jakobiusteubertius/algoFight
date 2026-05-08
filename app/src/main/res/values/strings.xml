@@ -11,4 +11,8 @@
     <string name="feedback_mostly_spanish">Mostly Spanish</string>
     <string name="feedback_mixed">Mixed</string>
     <string name="feedback_mostly_junk">Mostly junk</string>
+    <string name="enable_daily_reminder">Enable daily reminder</string>
+    <string name="training_reminder_channel">Training reminders</string>
+    <string name="training_reminder_title">5-minute Spanish feed tune-up</string>
+    <string name="training_reminder_text">Open algoFight and keep your TikTok learning signal warm.</string>
 </resources>

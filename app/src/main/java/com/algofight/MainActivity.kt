@@ -1,9 +1,12 @@
 package com.algofight
 
 import android.app.Activity
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
@@ -13,6 +16,7 @@ import android.widget.TextView
 import com.algofight.core.SpanishJourneyPresenter
 import com.algofight.core.SpanishTrainingJourney
 import com.algofight.core.BatchFeedback
+import com.algofight.core.ProgressPresenter
 
 class MainActivity : Activity() {
     private lateinit var store: JourneyStore
@@ -30,6 +34,10 @@ class MainActivity : Activity() {
     private lateinit var mostlySpanish: Button
     private lateinit var mixed: Button
     private lateinit var mostlyJunk: Button
+    private lateinit var progressTitle: TextView
+    private lateinit var progressDetail: TextView
+    private lateinit var reminder: Button
+    private val progressPresenter = ProgressPresenter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,6 +100,19 @@ class MainActivity : Activity() {
         mostlySpanish = feedbackButton(R.string.feedback_mostly_spanish, BatchFeedback.MostlySpanish)
         mixed = feedbackButton(R.string.feedback_mixed, BatchFeedback.Mixed)
         mostlyJunk = feedbackButton(R.string.feedback_mostly_junk, BatchFeedback.MostlyJunk)
+        progressTitle = TextView(this).apply {
+            textSize = 16f
+        }
+        progressDetail = TextView(this).apply {
+            textSize = 14f
+        }
+        reminder = Button(this).apply {
+            text = getString(R.string.enable_daily_reminder)
+            setOnClickListener {
+                requestNotificationPermissionIfNeeded()
+                TrainingReminderScheduler(this@MainActivity).scheduleDaily()
+            }
+        }
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
@@ -108,6 +129,9 @@ class MainActivity : Activity() {
             addView(mostlySpanish)
             addView(mixed)
             addView(mostlyJunk)
+            addView(progressTitle)
+            addView(progressDetail)
+            addView(reminder)
         }
 
         setContentView(layout)
@@ -140,6 +164,9 @@ class MainActivity : Activity() {
         mostlySpanish.visibility = if (visible) Button.VISIBLE else Button.GONE
         mixed.visibility = if (visible) Button.VISIBLE else Button.GONE
         mostlyJunk.visibility = if (visible) Button.VISIBLE else Button.GONE
+        val progress = progressPresenter.present(analysisStore.progressStats())
+        progressTitle.text = progress.title
+        progressDetail.text = progress.detail
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -155,7 +182,16 @@ class MainActivity : Activity() {
         }
     }
 
+    private fun requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), REQUEST_NOTIFICATIONS)
+        }
+    }
+
     private companion object {
         const val REQUEST_MEDIA_PROJECTION = 1001
+        const val REQUEST_NOTIFICATIONS = 1002
     }
 }

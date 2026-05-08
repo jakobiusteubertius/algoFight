@@ -4,7 +4,9 @@ import android.content.Context
 import com.algofight.core.BatchFeedback
 import com.algofight.core.FrameColor
 import com.algofight.core.FrameDecisionSession
+import com.algofight.core.ModelAgreement
 import com.algofight.core.PendingBatchFeedback
+import com.algofight.core.ProgressStats
 
 class AnalysisStore(context: Context) {
     private val preferences = context.getSharedPreferences("analysis", Context.MODE_PRIVATE)
@@ -28,8 +30,23 @@ class AnalysisStore(context: Context) {
     }
 
     fun recordFeedback(feedback: BatchFeedback) {
-        saveSession(loadSession().recordFeedback(feedback))
+        val updated = loadSession().recordFeedback(feedback)
+        val latest = updated.completedBatches.lastOrNull()
+        if (latest != null) {
+            preferences.edit()
+                .putInt(KEY_COMPLETED_BATCHES, progressStats().completedBatches + 1)
+                .putString(KEY_LATEST_AGREEMENT, latest.modelAgreement.name)
+                .apply()
+        }
+        saveSession(updated)
     }
+
+    fun progressStats(): ProgressStats =
+        ProgressStats(
+            completedBatches = preferences.getInt(KEY_COMPLETED_BATCHES, 0),
+            latestAgreement = preferences.getString(KEY_LATEST_AGREEMENT, null)
+                ?.let { runCatching { ModelAgreement.valueOf(it) }.getOrNull() },
+        )
 
     private fun loadSession(): FrameDecisionSession =
         FrameDecisionSession(
@@ -59,5 +76,7 @@ class AnalysisStore(context: Context) {
         const val KEY_LATEST_FRAME_COLOR = "latest_frame_color"
         const val KEY_ACTIVE_DECISIONS = "active_decisions"
         const val KEY_PENDING_DECISIONS = "pending_decisions"
+        const val KEY_COMPLETED_BATCHES = "completed_batches"
+        const val KEY_LATEST_AGREEMENT = "latest_agreement"
     }
 }
