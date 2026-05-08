@@ -13,6 +13,11 @@ When editing this repo:
   workflow.
 - Validate skill changes by checking that each `SKILL.md` has valid
   frontmatter and a clear workflow.
+- For Android work, use the repo Gradle wrapper. This machine has a user-local
+  JDK at `/Users/jt/Library/Java/JavaVirtualMachines/jdk-21.0.11+10/Contents/Home`
+  and Android SDK at `/Users/jt/Library/Android/sdk`.
+- Core Android feedback loop: `./gradlew testDebugUnitTest`.
+- APK smoke feedback loop: `./gradlew assembleDebug`.
 
 When using these skills in a target codebase:
 
