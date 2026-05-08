@@ -13,7 +13,9 @@ class SpanishJourneyPresenter {
             title = "Spanish TikTok Trainer",
             stepLabel = stepLabel,
             prompt = journey.currentPrompt,
+            guidanceItems = SpanishTrainingPack.guidanceFor(journey.currentStep),
             primaryAction = if (journey.isComplete) "Start learning batch" else "Mark step done",
+            secondaryAction = "Open TikTok",
         )
     }
 }

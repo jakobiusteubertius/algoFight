@@ -4,6 +4,7 @@ import android.app.Activity
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.pm.PackageManager.NameNotFoundException
 import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Build
@@ -25,7 +26,9 @@ class MainActivity : Activity() {
     private lateinit var journey: SpanishTrainingJourney
     private lateinit var stepLabel: TextView
     private lateinit var prompt: TextView
+    private lateinit var guidance: TextView
     private lateinit var action: Button
+    private lateinit var openTikTok: Button
     private lateinit var overlayPermission: Button
     private lateinit var usagePermission: Button
     private lateinit var overlaySession: Button
@@ -54,11 +57,19 @@ class MainActivity : Activity() {
         prompt = TextView(this).apply {
             textSize = 16f
         }
+        guidance = TextView(this).apply {
+            textSize = 14f
+        }
         action = Button(this).apply {
             setOnClickListener {
                 journey = journey.completeCurrentStep()
                 store.save(journey)
                 render()
+            }
+        }
+        openTikTok = Button(this).apply {
+            setOnClickListener {
+                openTikTok()
             }
         }
         overlayPermission = Button(this).apply {
@@ -120,7 +131,9 @@ class MainActivity : Activity() {
             addView(title)
             addView(stepLabel)
             addView(prompt)
+            addView(guidance)
             addView(action)
+            addView(openTikTok)
             addView(overlayPermission)
             addView(usagePermission)
             addView(overlaySession)
@@ -143,8 +156,30 @@ class MainActivity : Activity() {
         val state = presenter.present(journey)
         stepLabel.text = state.stepLabel
         prompt.text = state.prompt
+        guidance.text = state.guidanceItems.joinToString(separator = "\n") { "- $it" }
         action.text = state.primaryAction
+        openTikTok.text = state.secondaryAction
+        openTikTok.visibility = if (state.secondaryAction == null) Button.GONE else Button.VISIBLE
         renderFeedback()
+    }
+
+    private fun openTikTok() {
+        val intent = tiktokLaunchIntent() ?: Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse("market://details?id=com.zhiliaoapp.musically"),
+        )
+        startActivity(intent)
+    }
+
+    private fun tiktokLaunchIntent(): Intent? {
+        val packages = listOf("com.zhiliaoapp.musically", "com.ss.android.ugc.trill")
+        return packages.firstNotNullOfOrNull { packageName ->
+            try {
+                packageManager.getLaunchIntentForPackage(packageName)
+            } catch (_: NameNotFoundException) {
+                null
+            }
+        }
     }
 
     private fun feedbackButton(label: Int, feedback: BatchFeedback): Button =

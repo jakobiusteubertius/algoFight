@@ -243,3 +243,47 @@ sessions and shows whether the feed is improving.
 
 - `./gradlew testDebugUnitTest`
 - Manual notification check on Android device.
+
+## Issue 8: Add Spanish Training Pack Guidance
+
+## Problem
+
+The app currently has the technical overlay/OCR shell and a generic training
+journey, but it does not yet tell the user what to do in TikTok to train a
+Spanish-learning feed.
+
+## Scope
+
+- Add concrete guidance for each Spanish journey step.
+- Show recommended Spanish-learning creators.
+- Show recommended TikTok search terms.
+- Explain how to handle off-goal content.
+- Explain what the first 10-video training batch should do.
+- Add an Open TikTok action target where practical.
+
+## Acceptance Criteria
+
+- The fresh-account step explains why a fresh TikTok account helps and gives a
+  concise setup instruction.
+- The follow-creators step lists recommended Spanish-learning creators.
+- The search-terms step lists recommended search phrases.
+- The exclude-content step explains skip and Not interested behavior.
+- The initial-batch step explains green/red frame behavior during the first
+  10 videos.
+- The first-learning-batch step tells the user how to continue learning without
+  polluting the feed.
+- Presenter tests cover the concrete guidance for at least creators, search
+  terms, and exclusion behavior.
+
+## Likely Touched Areas
+
+- Spanish training journey domain content.
+- Journey presenter and view state.
+- Main activity rendering.
+- Unit tests.
+
+## Validation
+
+- `./gradlew testDebugUnitTest`
+- `./gradlew assembleDebug`
+- Emulator smoke check of the guidance screen.
