@@ -1,8 +1,6 @@
 package com.algofight
 
 import android.app.Service
-import android.app.usage.UsageEvents
-import android.app.usage.UsageStatsManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -22,6 +20,7 @@ import com.algofight.core.OverlayActivationPolicy
 class OverlayFrameService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val activationPolicy = OverlayActivationPolicy()
+    private lateinit var foregroundPackageReader: ForegroundPackageReader
     private var windowManager: WindowManager? = null
     private var frameView: View? = null
     private var sessionActive = false
@@ -34,6 +33,7 @@ class OverlayFrameService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        foregroundPackageReader = ForegroundPackageReader(this)
         when (intent?.action) {
             ACTION_STOP -> {
                 stopSelf()
@@ -95,25 +95,10 @@ class OverlayFrameService : Service() {
     private fun updateOverlayVisibility() {
         val result = activationPolicy.evaluate(
             sessionActive = sessionActive,
-            foregroundPackage = currentForegroundPackage(),
+            foregroundPackage = foregroundPackageReader.currentPackage(),
         )
 
         frameView?.visibility = if (result.visible) View.VISIBLE else View.GONE
-    }
-
-    private fun currentForegroundPackage(): String? {
-        val usageStats = getSystemService(UsageStatsManager::class.java)
-        val now = System.currentTimeMillis()
-        val events = usageStats.queryEvents(now - FOREGROUND_LOOKBACK_MS, now)
-        val event = UsageEvents.Event()
-        var latestPackage: String? = null
-        while (events.hasNextEvent()) {
-            events.getNextEvent(event)
-            if (event.eventType == UsageEvents.Event.ACTIVITY_RESUMED) {
-                latestPackage = event.packageName
-            }
-        }
-        return latestPackage
     }
 
     private fun frameDrawable(color: FrameColor): GradientDrawable =
@@ -132,7 +117,6 @@ class OverlayFrameService : Service() {
     companion object {
         private const val ACTION_STOP = "com.algofight.action.STOP_OVERLAY"
         private const val POLL_INTERVAL_MS = 1_000L
-        private const val FOREGROUND_LOOKBACK_MS = 10_000L
         private const val FRAME_WIDTH_PX = 10
 
         fun startIntent(context: Context): Intent =

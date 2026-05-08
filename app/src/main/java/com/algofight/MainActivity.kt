@@ -2,6 +2,7 @@ package com.algofight
 
 import android.app.Activity
 import android.content.Intent
+import android.media.projection.MediaProjectionManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -22,6 +23,7 @@ class MainActivity : Activity() {
     private lateinit var overlayPermission: Button
     private lateinit var usagePermission: Button
     private lateinit var overlaySession: Button
+    private lateinit var screenAnalysis: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +69,16 @@ class MainActivity : Activity() {
                 startService(OverlayFrameService.startIntent(this@MainActivity))
             }
         }
+        screenAnalysis = Button(this).apply {
+            text = getString(R.string.start_screen_analysis)
+            setOnClickListener {
+                val projectionManager = getSystemService(MediaProjectionManager::class.java)
+                startActivityForResult(
+                    projectionManager.createScreenCaptureIntent(),
+                    REQUEST_MEDIA_PROJECTION,
+                )
+            }
+        }
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
@@ -78,6 +90,7 @@ class MainActivity : Activity() {
             addView(overlayPermission)
             addView(usagePermission)
             addView(overlaySession)
+            addView(screenAnalysis)
         }
 
         setContentView(layout)
@@ -90,5 +103,22 @@ class MainActivity : Activity() {
         stepLabel.text = state.stepLabel
         prompt.text = state.prompt
         action.text = state.primaryAction
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == REQUEST_MEDIA_PROJECTION && resultCode == RESULT_OK && data != null) {
+            startForegroundService(
+                ScreenAnalysisService.startIntent(
+                    context = this,
+                    resultCode = resultCode,
+                    data = data,
+                ),
+            )
+        }
+    }
+
+    private companion object {
+        const val REQUEST_MEDIA_PROJECTION = 1001
     }
 }

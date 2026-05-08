@@ -4,4 +4,8 @@
     <string name="allow_overlay">Allow overlay frame</string>
     <string name="allow_usage_access">Allow TikTok detection</string>
     <string name="start_overlay_session">Start TikTok overlay</string>
+    <string name="start_screen_analysis">Start screen analysis</string>
+    <string name="screen_analysis_channel">Screen analysis</string>
+    <string name="screen_analysis_notification_title">algoFight is reading TikTok text</string>
+    <string name="screen_analysis_notification_text">Screen analysis only runs during an active TikTok training session.</string>
 </resources>
