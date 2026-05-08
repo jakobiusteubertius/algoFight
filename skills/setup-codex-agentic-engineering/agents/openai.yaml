@@ -1,0 +1,3 @@
+display_name: Setup Codex Engineering
+short_description: Configure a repo for Codex agentic engineering workflows.
+default_prompt: Set up this repository for the Codex agentic engineering skills.

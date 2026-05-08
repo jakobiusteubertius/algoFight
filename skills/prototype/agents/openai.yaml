@@ -1,0 +1,3 @@
+display_name: Prototype
+short_description: Build throwaway prototypes to answer design questions.
+default_prompt: Prototype this idea so we can learn quickly.

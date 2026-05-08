@@ -1,0 +1,3 @@
+display_name: Grill Me
+short_description: Ask rigorous questions before non-code execution.
+default_prompt: Grill me on this plan before I act.

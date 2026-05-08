@@ -1,0 +1,3 @@
+display_name: Diagnose
+short_description: Debug with a disciplined evidence-first loop.
+default_prompt: Diagnose this bug and fix the confirmed cause.

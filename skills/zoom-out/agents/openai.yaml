@@ -1,0 +1,3 @@
+display_name: Zoom Out
+short_description: Explain code in its broader system context.
+default_prompt: Zoom out and explain this part of the codebase.
