@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">algoFight</string>
     <string name="app_promise">Train a fresh TikTok account into a Spanish-learning feed.</string>
+    <string name="allow_overlay">Allow overlay frame</string>
+    <string name="allow_usage_access">Allow TikTok detection</string>
+    <string name="start_overlay_session">Start TikTok overlay</string>
 </resources>
