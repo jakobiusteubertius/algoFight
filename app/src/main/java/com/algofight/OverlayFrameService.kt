@@ -21,6 +21,7 @@ class OverlayFrameService : Service() {
     private val handler = Handler(Looper.getMainLooper())
     private val activationPolicy = OverlayActivationPolicy()
     private lateinit var foregroundPackageReader: ForegroundPackageReader
+    private lateinit var analysisStore: AnalysisStore
     private var windowManager: WindowManager? = null
     private var frameView: View? = null
     private var sessionActive = false
@@ -34,6 +35,7 @@ class OverlayFrameService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         foregroundPackageReader = ForegroundPackageReader(this)
+        analysisStore = AnalysisStore(this)
         when (intent?.action) {
             ACTION_STOP -> {
                 stopSelf()
@@ -98,6 +100,7 @@ class OverlayFrameService : Service() {
             foregroundPackage = foregroundPackageReader.currentPackage(),
         )
 
+        frameView?.background = frameDrawable(analysisStore.latestFrameColor())
         frameView?.visibility = if (result.visible) View.VISIBLE else View.GONE
     }
 

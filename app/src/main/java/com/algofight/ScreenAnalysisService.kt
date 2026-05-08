@@ -35,6 +35,7 @@ class ScreenAnalysisService : Service() {
     private val classifier = SpanishLearningClassifier()
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private lateinit var foregroundPackageReader: ForegroundPackageReader
+    private lateinit var analysisStore: AnalysisStore
     private var mediaProjection: MediaProjection? = null
     private var imageReader: ImageReader? = null
     private var processing = false
@@ -50,6 +51,7 @@ class ScreenAnalysisService : Service() {
     override fun onCreate() {
         super.onCreate()
         foregroundPackageReader = ForegroundPackageReader(this)
+        analysisStore = AnalysisStore(this)
         createNotificationChannel()
     }
 
@@ -131,6 +133,7 @@ class ScreenAnalysisService : Service() {
             recognizer.process(InputImage.fromBitmap(crop, 0))
                 .addOnSuccessListener { text ->
                     val result = classifier.classify(text.text)
+                    analysisStore.recordDecision(result.color)
                     Log.d(TAG, "region=${region.name} color=${result.color} reasons=${result.reasons}")
                 }
                 .addOnFailureListener { error ->

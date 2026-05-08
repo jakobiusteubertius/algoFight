@@ -12,9 +12,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.algofight.core.SpanishJourneyPresenter
 import com.algofight.core.SpanishTrainingJourney
+import com.algofight.core.BatchFeedback
 
 class MainActivity : Activity() {
     private lateinit var store: JourneyStore
+    private lateinit var analysisStore: AnalysisStore
     private val presenter = SpanishJourneyPresenter()
     private lateinit var journey: SpanishTrainingJourney
     private lateinit var stepLabel: TextView
@@ -24,10 +26,15 @@ class MainActivity : Activity() {
     private lateinit var usagePermission: Button
     private lateinit var overlaySession: Button
     private lateinit var screenAnalysis: Button
+    private lateinit var feedbackPrompt: TextView
+    private lateinit var mostlySpanish: Button
+    private lateinit var mixed: Button
+    private lateinit var mostlyJunk: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         store = JourneyStore(this)
+        analysisStore = AnalysisStore(this)
         journey = store.load()
 
         val title = TextView(this).apply {
@@ -79,6 +86,12 @@ class MainActivity : Activity() {
                 )
             }
         }
+        feedbackPrompt = TextView(this).apply {
+            textSize = 14f
+        }
+        mostlySpanish = feedbackButton(R.string.feedback_mostly_spanish, BatchFeedback.MostlySpanish)
+        mixed = feedbackButton(R.string.feedback_mixed, BatchFeedback.Mixed)
+        mostlyJunk = feedbackButton(R.string.feedback_mostly_junk, BatchFeedback.MostlyJunk)
         val layout = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER
@@ -91,6 +104,10 @@ class MainActivity : Activity() {
             addView(usagePermission)
             addView(overlaySession)
             addView(screenAnalysis)
+            addView(feedbackPrompt)
+            addView(mostlySpanish)
+            addView(mixed)
+            addView(mostlyJunk)
         }
 
         setContentView(layout)
@@ -103,6 +120,26 @@ class MainActivity : Activity() {
         stepLabel.text = state.stepLabel
         prompt.text = state.prompt
         action.text = state.primaryAction
+        renderFeedback()
+    }
+
+    private fun feedbackButton(label: Int, feedback: BatchFeedback): Button =
+        Button(this).apply {
+            text = getString(label)
+            setOnClickListener {
+                analysisStore.recordFeedback(feedback)
+                renderFeedback()
+            }
+        }
+
+    private fun renderFeedback() {
+        val pending = analysisStore.pendingFeedback()
+        val visible = pending != null
+        feedbackPrompt.text = pending?.summary.orEmpty()
+        feedbackPrompt.visibility = if (visible) TextView.VISIBLE else TextView.GONE
+        mostlySpanish.visibility = if (visible) Button.VISIBLE else Button.GONE
+        mixed.visibility = if (visible) Button.VISIBLE else Button.GONE
+        mostlyJunk.visibility = if (visible) Button.VISIBLE else Button.GONE
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

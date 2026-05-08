@@ -8,4 +8,7 @@
     <string name="screen_analysis_channel">Screen analysis</string>
     <string name="screen_analysis_notification_title">algoFight is reading TikTok text</string>
     <string name="screen_analysis_notification_text">Screen analysis only runs during an active TikTok training session.</string>
+    <string name="feedback_mostly_spanish">Mostly Spanish</string>
+    <string name="feedback_mixed">Mixed</string>
+    <string name="feedback_mostly_junk">Mostly junk</string>
 </resources>
